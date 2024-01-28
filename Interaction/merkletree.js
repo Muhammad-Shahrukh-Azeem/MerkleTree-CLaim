@@ -13,6 +13,7 @@ function generateMerkleProof(address) {
   return hexProof;
 }
 
+console.log("Merkle root: ", merkleTree.getRoot().toString("hex"))
 
 module.exports = {
     generateMerkleProof

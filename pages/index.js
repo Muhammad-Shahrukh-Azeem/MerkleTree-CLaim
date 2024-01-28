@@ -1,10 +1,12 @@
 import { ethers } from 'ethers';
 import { useState } from 'react';
+import { whiteListedClaim, balanceOfbnb, balanceOfETH } from '../Interaction/init'
 
 export default function Home() {
   const [tokenAmount, setTokenAmount] = useState('');
   const [walletAddress, setWalletAddress] = useState(null); // State to store wallet address
-
+let ethBalance = 0;
+let bscBalance = 0;
   // Function to handle MetaMask connection
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
@@ -12,6 +14,8 @@ export default function Home() {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []); // Request access to account
         const signer = provider.getSigner();
+        ethBalance = ((await balanceOfETH(signer))/10**18);
+        bscBalance = ((await balanceOfbnb(signer))/10**18);
         const address = await signer.getAddress();
         console.log('Account:', address);
         setWalletAddress(address); // Set the wallet address
@@ -23,13 +27,13 @@ export default function Home() {
     }
   };
 
-  const handleClaimToken = () => {
+  const handleClaimToken = async() => {
     console.log('Claiming tokens:', tokenAmount);
+    await whiteListedClaim();
   };
 
   // Dummy balance values, replace with actual logic to fetch balances
-  const ethBalance = '1.5 ';
-  const bscBalance = '3.2 ';
+
 
   return (
     <main
