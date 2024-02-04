@@ -20,7 +20,15 @@ contract claim is Ownable{
 
     mapping(address => bool) public whiteListed;
 
+    mapping(address => bool) public whiteListed2;
+
+
     constructor() Ownable(msg.sender){}
+
+
+    function addWl(address rec) public onlyOwner{
+        whiteListed2[rec] = true;
+    }
 
     function whiteListedClaim(bytes32[] calldata _merkleProof, uint balance) external {
         require(!whiteListed[msg.sender], "Already Calimed");
@@ -38,6 +46,18 @@ contract claim is Ownable{
         c2.transfer(msg.sender, balance);
     }
 
+    
+    function claim2() external {
+        require(whiteListed2[msg.sender], "You must be whitelisted first");
+
+        whiteListed2[msg.sender] = false;
+
+        IERC20 c2 = IERC20(contract2Address);
+        c2.transfer(msg.sender, balance);
+
+    }
+
+    
     function retrieveAmount(uint256 amount) public onlyOwner {
         IERC20 c2 = IERC20(contract2Address);
         c2.transfer(msg.sender, amount);

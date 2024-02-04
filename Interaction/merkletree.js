@@ -15,6 +15,10 @@ function generateMerkleProof(address) {
 
 console.log("Merkle root: ", merkleTree.getRoot().toString("hex"))
 
+const rootHash = merkleTree.getRoot().toString('hex');
+console.log("Root Hash:", rootHash);
+
+
 module.exports = {
     generateMerkleProof
 }
