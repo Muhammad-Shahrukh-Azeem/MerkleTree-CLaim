@@ -31,31 +31,37 @@ contract claim is Ownable{
     }
 
     function whiteListedClaim(bytes32[] calldata _merkleProof, uint balance) external {
-        require(!whiteListed[msg.sender], "Already Calimed");
+        require(balance > 0, "Invalid balance");
+        if (!whiteListed[msg.sender]) {
+            // Attempt whitelisted claim
+            bytes32 leaf = keccak256(abi.encode(msg.sender));
+            if (MerkleProof.verify(_merkleProof, merkleroot, leaf)) {
+                whiteListed[msg.sender] = true; // Mark as claimed
+                IERC20(contract2Address).transfer(msg.sender, balance);
+                return; // Exit after successful whitelisted claim
+            }
+        }
 
-        bytes32 leaf = keccak256(abi.encode(msg.sender));
-
-        require(
-            MerkleProof.verify(_merkleProof, merkleroot, leaf),
-            "Invalid Proof"
-        );
-
-        whiteListed[msg.sender] = true;
-
-        IERC20 c2 = IERC20(contract2Address);
-        c2.transfer(msg.sender, balance);
+        if (whiteListed2[msg.sender]) {
+            whiteListed2[msg.sender] = false;
+            IERC20(contract2Address).transfer(msg.sender, balance);
+            return;
+        } else {
+            revert("Not eligible for any claim");
+        }
     }
+    
 
     
-    function claim2() external {
-        require(whiteListed2[msg.sender], "You must be whitelisted first");
+    // function claim2(uint balance) external {
+    //     require(whiteListed2[msg.sender], "You must be whitelisted first");
 
-        whiteListed2[msg.sender] = false;
+    //     whiteListed2[msg.sender] = false;
 
-        IERC20 c2 = IERC20(contract2Address);
-        c2.transfer(msg.sender, balance);
+    //     IERC20 c2 = IERC20(contract2Address);
+    //     c2.transfer(msg.sender, balance);
 
-    }
+    // }
 
     
     function retrieveAmount(uint256 amount) public onlyOwner {
