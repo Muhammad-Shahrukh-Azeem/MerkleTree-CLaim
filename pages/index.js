@@ -3,24 +3,26 @@ import { useState } from 'react';
 import { whiteListedClaim, balanceOfbnb, balanceOfETH } from '../Interaction/init';
 
 export default function Home() {
-  const [walletAddress, setWalletAddress] = useState(null); // State to store wallet address
-  const [signer, setSigner] = useState(null); // State to store the signer
-  let ethBalance = 0;
-  let bscBalance = 0;
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [signer, setSigner] = useState(null);
+  const [ethBalance, setEthBalance] = useState(0); // Use state for ETH balance
+  const [bscBalance, setBscBalance] = useState(0); // Use state for BSC balance
 
-  // Function to handle MetaMask connection
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         const signer = provider.getSigner();
-        ethBalance = (await balanceOfETH(signer)) / 10**18;
-        bscBalance = (await balanceOfbnb(signer)) / 10**18;
+        const ethBalanceValue = (await balanceOfETH(signer)) / 10**18;
+        const bscBalanceValue = (await balanceOfbnb(signer)) / 10**18;
         const address = await signer.getAddress();
+        console.log("Balance bnb: ", bscBalanceValue)
         console.log('Account:', address);
         setWalletAddress(address); // Set the wallet address
         setSigner(signer); // Set the signer
+        setEthBalance(ethBalanceValue); // Update ETH balance state
+        setBscBalance(bscBalanceValue); // Update BSC balance state
       } catch (error) {
         console.error(error);
       }

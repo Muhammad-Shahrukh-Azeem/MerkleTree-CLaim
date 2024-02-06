@@ -11,12 +11,12 @@ contract claim is Ownable{
 
     // Change merkleroot before deploying  
 
-    bytes32 public merkleroot = 0x219f6dd39c798084dcb9a2072b5ea2dd8200cdeb04cddc9ddce684a5520fefd9;
+    bytes32 public merkleroot = 0x175fe0d88f2c38afc2c43aa259a2adc4ff9c284c9ac8f7bf87f23ce43a6378ac;
 
     // Change contract2Address before deploying  
 
 
-    address public contract2Address = 0x99703F85d9E43c53d0cD10806DBddA5B53375D65;
+    address public contract2Address = 0x4Bb296ADc3B003187175794A6F7f78593682f951;
 
     mapping(address => bool) public whiteListed;
 
@@ -34,7 +34,7 @@ contract claim is Ownable{
         require(balance > 0, "Invalid balance");
         if (!whiteListed[msg.sender]) {
             // Attempt whitelisted claim
-            bytes32 leaf = keccak256(abi.encode(msg.sender));
+            bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
             if (MerkleProof.verify(_merkleProof, merkleroot, leaf)) {
                 whiteListed[msg.sender] = true; // Mark as claimed
                 IERC20(contract2Address).transfer(msg.sender, balance);
